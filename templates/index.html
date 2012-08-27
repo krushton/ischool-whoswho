@@ -12,21 +12,23 @@
 <div id="content">
 	
 	<div id="main">
-	<h1>Who is {{ featuredName }}?</h1>
+	<h1>Who is {{ featured.name }}?</h1>
 
-	<a href="#" class="profile-one" data-reveal-id="{{ featured1 }}"><img src='static/profilephotos/{{ handle1 }}.jpeg' class='{{ featured1 }}'></a><a href="#" class="profile-two" data-reveal-id="{{ featured2 }}"><img src='static/profilephotos/{{ handle2 }}.jpeg'></a><a href="#" class="profile-three" data-reveal-id="{{ featured3 }}"><img src='static/profilephotos/{{ handle3 }}.jpeg'  class='{{ featured3 }}'></a>
+	<a href="#" class="profile-one" data-reveal-id="{{ featured1.status }}"><img src='{{featured1.pic}}'></a>
+	<a href="#" class="profile-two" data-reveal-id="{{ featured2.status }}"><img src='{{ featured2.pic }}'></a>
+	<a href="#" class="profile-three" data-reveal-id="{{ featured3.status }}"><img src='{{featured3.pic}}'></a>
 	</div>
-
 	<div id="footer">
 		<h2>About this Site</h2>
 		<p>Who's Who is a website for learning the names and faces of current students at the <a href="http://ischool.berkeley.edu">UC Berkeley School of Information</a>. It was hacked together in an afternoon by <a href="http://davelester.org">Dave Lester</a>. The <a href="http://www.flickr.com/photos/n8agrin/2073530456/">photo of South Hall</a> used as the website's background image was taken by Nate Agrin.</p>
 	</div>
 </div>
 
+
 <div id="featured" class="reveal-modal">
-	<h1>Correct! Meet {{ featuredName }}</h1>
-	<p>Focus: {{ featuredFocus }}</p>
-	<a class="close-reveal-modal">&#215;</a>
+	<h1>Correct! Meet {{ featured.name }}</h1>
+	<p>Year: {{ featured.year }}</p>
+	<a class="close-reveal-modal" onClick="window.location.reload()">&#215;</a>
 </div>
 
 <div id="notfeatured" class="reveal-modal">

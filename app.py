@@ -1,54 +1,48 @@
-import random
+import random, urllib2
+from bs4 import BeautifulSoup
 from flask import Flask, render_template
-app = Flask(__name__)
 
-file = open('studentdata', 'r')
-lines = file.readlines()
-global lines
-file.close()
+app = Flask(__name__)
 
 @app.route("/")
 def index():
-    numberOfStudents = 3
-    students = chooseStudents(numberOfStudents)
-    
-    name = []
-    handle = []
-    year = []
-    focus = []
-    featured = []
+	numberOfStudents = 3
+	index = random.randint(1,numberOfStudents)
+	students = getStudents(numberOfStudents)
+	for i in range(0,len(students)):
+		if i == index:
+			students[i].status = 'featured'
+		else:
+			students[i].status = 'notfeatured'	
+	featuredPerson = students[index]
+	return render_template('index.html', featured=featuredPerson, featured1=students[0], featured2=students[1], featured3=students[2])
+	
+	
+def getStudents(num=3):
+	url = 'http://www.ischool.berkeley.edu/people/students/masters/'
+	req = urllib2.Request(url, headers={'User-Agent':' Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0'}) 
+	results_html = urllib2.urlopen(req).read()
+	soup = BeautifulSoup(results_html)
+	tables = soup.find_all('table', {'class':'person-teaser'})
+	students = []
+	for i in range(0,num):
+		students.append(getStudent(tables))
+	return students
+	
+def getStudent(tables):
+	randTableIndex = random.randint(1, len(tables)) - 1
+	randT = tables[randTableIndex]
+	sd = StudentData()
+	sd.name = randT.find('div', {'class':'title'}).find('a').contents[0]
+	sd.year = randT.find('div', {'class': 'field-field-person-degree-year'}).contents[0]
+	sd.status = "notfeatured"
+	url = randT.find('img')['src']
+	sd.pic = 'http://www.ischool.berkeley.edu' + url
+	return sd
 
-    studentIndex = 0
-    for student in students:
-        student = lines[students[studentIndex]] 
-        cols = student.split('\t')
-
-        if (studentIndex == 0):
-            featuredName = cols[0]
-            featuredFocus = cols[4]
-            featured.append('featured')
-        else:
-            featured.append('notfeatured')
-
-        name.append(cols[0])
-        handle.append(cols[1])
-        year.append(cols[2])
-        focus.append(cols[4])
-        studentIndex += 1
-
-    order = [0, 1, 2]
-    random.shuffle(order)
-
-    # for the record, this is a dump way of passing data to the template.. I didn't realize that Flask templates
-    # support logic for loops and multiple data structures. this and associated code above should be simplified
-    return render_template('index.html', featuredName=featuredName, featuredFocus=featuredFocus, name1=name[order[0]], handle1=handle[order[0]], year1=year[order[0]], focus1=focus[order[0]], featured1=featured[order[0]], name2=name[order[1]], handle2=handle[order[1]], year2=year[order[1]], focus2=focus[order[1]], featured2=featured[order[1]], name3=name[order[2]], handle3=handle[order[2]], year3=year[order[2]], focus3=focus[order[2]], featured3=featured[order[2]])
-
-def chooseStudents(num=3):
-    students = []
-    while (len(set(students)) < num):
-        randomid = random.randrange(0, len(lines))
-        students.append(randomid)
-    return students
+class StudentData:
+    pass
 
 if __name__ == "__main__":
-    app.run()
+	app.run()
+	
